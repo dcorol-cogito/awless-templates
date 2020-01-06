@@ -30,5 +30,5 @@ runcmd:
   - [pip, install, "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"]
   - [curl, -O, "https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/master/scripts/bastion_bootstrap.sh"]
   - /bin/bash bastion_bootstrap.sh -- --tcp-forwarding true --enable false
-power_state:
-  mode: reboot
+# power_state:
+#   mode: reboot
