@@ -7,7 +7,23 @@ packages:
  - curl
  - python-pip
 
+# - name: sethostname.service
+#   command: start
+#   content: |
+#     [Unit]
+#     Description=Set Hostname Workaround https://github.com/coreos/bugs/issues/1272
+
+#     [Service]
+#     Type=oneshot
+#     ExecStart=/bin/sh -c "/usr/bin/hostnamectl set-hostname $(curl -s http://169.254.169.254/latest/meta-data/hostname | sed 's/^ip-/bastion-/')"
+
+#     [Install]
+#     WantedBy=local.target
+
 runcmd:
+  - hostn=$(cat curl -s http://169.254.169.254/latest/meta-data/hostname | sed 's/^ip-/bastion-/')
+  - echo "Set hostname to $hostn"
+  - echo $hostn > /etc/hostname
   - export PATH=$PATH:/usr/local/bin
   - pip install --upgrade pip
   - pip install awscli --ignore-installed six
