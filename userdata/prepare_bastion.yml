@@ -8,17 +8,15 @@ packages:
  - python3-pip
 
 runcmd:
-  - hostn=$(curl -s http://169.254.169.254/latest/meta-data/hostname | sed 's/^ip-/bastion-/')
-  - hostId=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-  - hostRegion=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
-  - echo "Set hostname to $hostn"
-  - echo $hostn > /etc/hostname
   - export PATH=$PATH:/usr/local/bin
   - pip install --upgrade pip
   - pip install awscli --ignore-installed six
-  - [pip, install, "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"]
-  - [curl, -O, "https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/master/scripts/bastion_bootstrap.sh"]
-  - /bin/bash bastion_bootstrap.sh -- --tcp-forwarding true --enable false
+  - hostId=$(curl --silent http://169.254.169.254/latest/meta-data/instance-id)
+  - hostRegion=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+  - hostRole=$(aws --region ${hostRegion} ec2 describe-tags --filters "Name=resource-id,Values=$hostId" "Name=key,Values=Role" --output=text | cut -f5)
+  - hostn=$(curl --silent http://169.254.169.254/latest/meta-data/hostname | sed "s/^ip-/${hostRole}-/")
+  - echo "Set hostname to $hostn"
+  - echo $hostn > /etc/hostname
   - aws --region ${hostRegion} ec2 create-tags --resources ${hostId} --tags Key=Name,Value=${hostn}
 power_state:
   mode: reboot
