@@ -9,7 +9,7 @@ packages:
 
 runcmd:
   - export PATH=$PATH:/usr/local/bin
-  - pip install --upgrade pip
+  - pip3 install --upgrade pip
   - pip install awscli --ignore-installed six
   - [pip, install, "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"]
   - [curl, -O, "https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/master/scripts/bastion_bootstrap.sh"]
