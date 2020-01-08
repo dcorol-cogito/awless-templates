@@ -22,4 +22,5 @@ runcmd:
   - aws --region ${hostRegion} ec2 create-tags --resources ${hostId} --tags Key=Name,Value=${hostn}
   - /bin/bash bastion_bootstrap.sh -- --tcp-forwarding true --enable false
 power_state:
+  timeout: 30
   mode: reboot
