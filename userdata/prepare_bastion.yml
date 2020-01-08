@@ -7,21 +7,10 @@ packages:
  - curl
  - python3-pip
 
-# - name: sethostname.service
-#   command: start
-#   content: |
-#     [Unit]
-#     Description=Set Hostname Workaround https://github.com/coreos/bugs/issues/1272
-
-#     [Service]
-#     Type=oneshot
-#     ExecStart=/bin/sh -c "/usr/bin/hostnamectl set-hostname $(curl -s http://169.254.169.254/latest/meta-data/hostname | sed 's/^ip-/bastion-/')"
-
-#     [Install]
-#     WantedBy=local.target
-
 runcmd:
   - hostn=$(curl -s http://169.254.169.254/latest/meta-data/hostname | sed 's/^ip-/bastion-/')
+  - hostId=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+  - hostRegion=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
   - echo "Set hostname to $hostn"
   - echo $hostn > /etc/hostname
   - export PATH=$PATH:/usr/local/bin
@@ -30,5 +19,6 @@ runcmd:
   - [pip, install, "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"]
   - [curl, -O, "https://raw.githubusercontent.com/aws-quickstart/quickstart-linux-bastion/master/scripts/bastion_bootstrap.sh"]
   - /bin/bash bastion_bootstrap.sh -- --tcp-forwarding true --enable false
-# power_state:
-#   mode: reboot
+  - aws --region ${hostRegion} ec2 create-tags --resources ${hostId} --tags Key=Name,Value=${hostn}
+power_state:
+  mode: reboot
